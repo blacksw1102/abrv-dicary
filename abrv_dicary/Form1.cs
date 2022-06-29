@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace abrv_dicary
 {
     public partial class Form1 : Form
     {
+        private MariaDB mariaDB;
+
         public Form1()
         {
             InitializeComponent();
@@ -22,26 +25,54 @@ namespace abrv_dicary
             comboBox1.Items.Add("용어명");
             comboBox1.Items.Add("용어영문명");
             comboBox1.SelectedIndex = 0;
+
+            mariaDB = new MariaDB();
         }
         
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("test message", "test title");
+            if(!CheckKeyword())
+            {
+                return;
+            }
+            
+            string message = "";
+
+            if(mariaDB.ConnectionTest())
+            {
+                message = "connection 성공";
+            }
+            else
+            {
+                message = "connection 성공";
+            }
+
+            Debug.WriteLine(message);
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (!CheckKeyword())
+                {
+                    return;
+                }
+            }
+        }
+
+        // 키워드 체크
+        private bool CheckKeyword()
+        {
+            bool result = true;
+
+            if (textBox1.Text.Length < 2)
+            {
+                MessageBox.Show("2글자 이상의 키워드를 입력해주세요.");
+                result = false;
+            }
+
+            return result;
         }
     }
 }
