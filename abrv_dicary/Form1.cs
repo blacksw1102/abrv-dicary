@@ -13,7 +13,7 @@ namespace abrv_dicary
 {
     public partial class Form1 : Form
     {
-        private MariaDB mariaDB;
+        private readonly string[] columnNames = {"NO", "용어명", "용어영문명", "영문약어명", "정의"};
 
         public Form1()
         {
@@ -26,7 +26,11 @@ namespace abrv_dicary
             comboBox1.Items.Add("용어영문명");
             comboBox1.SelectedIndex = 0;
 
-            mariaDB = new MariaDB();
+            dataGridView1.EnableHeadersVisualStyles = false;
+            dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.Black;
+            dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+
+            SelectWords();
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -35,19 +39,8 @@ namespace abrv_dicary
             {
                 return;
             }
-            
-            string message = "";
 
-            if(mariaDB.ConnectionTest())
-            {
-                message = "connection 성공";
-            }
-            else
-            {
-                message = "connection 성공";
-            }
-
-            Debug.WriteLine(message);
+            SelectWords();
         }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
@@ -58,6 +51,8 @@ namespace abrv_dicary
                 {
                     return;
                 }
+
+                SelectWords();
             }
         }
 
@@ -66,10 +61,53 @@ namespace abrv_dicary
         {
             bool result = true;
 
-            if (textBox1.Text.Length < 2)
+            if (textBox1.Text.Length == 1)
             {
                 MessageBox.Show("2글자 이상의 키워드를 입력해주세요.");
                 result = false;
+            }
+
+            return result;
+        }
+
+        private bool SelectWords()
+        {
+            bool result = true;
+            string keyword = textBox1.Text;
+
+            MariaUtil.Instance.Open();
+
+            if (MariaUtil.Instance.IsOpen())
+            {
+                String query = "";
+                query += "SELECT word_id";
+                query += "       ,word_nm";
+                query += "       ,word_en_nm";
+                query += "       ,word_abrv_nm";
+                query += "       ,word_dc";
+                query += "  FROM word";
+                if(!string.IsNullOrEmpty(keyword))
+                {
+                query += " WHERE MATCH(word_nm) AGAINST('" + keyword + "' IN BOOLEAN MODE)";
+                }
+
+                DataTable dt = MariaUtil.Instance.Select(query);
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    dt.Columns[i].ColumnName = columnNames[i];
+                }
+                dataGridView1.DataSource = dt;
+
+                Debug.WriteLine("Column size : " + dataGridView1.Columns.Count);
+                for (int i = 0; i < dataGridView1.Columns.Count; i++)
+                {
+                    dataGridView1.Columns[i].Frozen = false;
+                }
+            }
+            else
+            {
+                result = false;
+                MessageBox.Show("데이터베이스가 연결되있지 않습니다.");
             }
 
             return result;
