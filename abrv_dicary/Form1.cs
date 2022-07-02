@@ -14,6 +14,7 @@ namespace abrv_dicary
     public partial class Form1 : Form
     {
         private readonly string[] columnNames = {"NO", "용어명", "용어영문명", "영문약어명", "정의"};
+        private readonly string[] ctgrys = { "용어명", "용어영문명" };
 
         public Form1()
         {
@@ -22,8 +23,10 @@ namespace abrv_dicary
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBox1.Items.Add("용어명");
-            comboBox1.Items.Add("용어영문명");
+            foreach(string ctgry in ctgrys)
+            {
+                comboBox1.Items.Add(ctgry);
+            }
             comboBox1.SelectedIndex = 0;
 
             dataGridView1.EnableHeadersVisualStyles = false;
@@ -74,6 +77,17 @@ namespace abrv_dicary
         {
             bool result = true;
             string keyword = textBox1.Text;
+            string comboBoxText = comboBox1.Text;
+            string ctgry = "";
+
+            if(comboBox1.SelectedIndex == 0)
+            {
+                ctgry = "word_nm";
+            } 
+            else
+            {
+                ctgry = "word_en_nm";
+            }
 
             MariaUtil.Instance.Open();
 
@@ -88,7 +102,7 @@ namespace abrv_dicary
                 query += "  FROM word";
                 if(!string.IsNullOrEmpty(keyword))
                 {
-                query += " WHERE MATCH(word_nm) AGAINST('" + keyword + "' IN BOOLEAN MODE)";
+                query += " WHERE MATCH(" + ctgry + ") AGAINST('" + keyword + "' IN BOOLEAN MODE)";
                 }
 
                 DataTable dt = MariaUtil.Instance.Select(query);
@@ -98,19 +112,23 @@ namespace abrv_dicary
                 }
                 dataGridView1.DataSource = dt;
 
-                Debug.WriteLine("Column size : " + dataGridView1.Columns.Count);
                 for (int i = 0; i < dataGridView1.Columns.Count; i++)
                 {
-                    dataGridView1.Columns[i].Frozen = false;
+                    dataGridView1.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                 }
             }
             else
             {
                 result = false;
-                MessageBox.Show("데이터베이스가 연결되있지 않습니다.");
+                MessageBox.Show("데이터베이스가 연결되어있지 않습니다.");
             }
 
             return result;
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

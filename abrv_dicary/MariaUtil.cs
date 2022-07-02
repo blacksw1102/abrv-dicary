@@ -90,26 +90,10 @@ namespace abrv_dicary
             var mySqlDataTable = new DataTable();
             try
             {
+                Debug.WriteLine(sql);
                 MySqlCommand mySqlCommand = new MySqlCommand(sql, dbConnection);
                 MySqlDataReader mySqlDataReader = mySqlCommand.ExecuteReader();
                 mySqlDataTable.Load(mySqlDataReader);
-
-                StringBuilder output = new StringBuilder();
-                foreach (DataColumn col in mySqlDataTable.Columns)
-                {
-                    output.AppendFormat("{0} ", col);
-                }
-                output.AppendLine();
-                foreach (DataRow page in mySqlDataTable.Rows)
-                {
-                    foreach (DataColumn col in mySqlDataTable.Columns)
-                    {
-                        output.AppendFormat("{0} ", page[col]);
-                    }
-                    output.AppendLine();
-                }
-                Console.WriteLine(output.ToString());
-
                 mySqlDataReader.Close();
             }
             catch (Exception ex)
