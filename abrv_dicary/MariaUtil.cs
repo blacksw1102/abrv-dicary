@@ -1,16 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace abrv_dicary
+namespace AbrvDicary
 {
-    class MariaUtil
+    public class MariaUtil
     {
         public static MariaUtil mariaDB;
         private MySqlConnection dbConnection;
@@ -80,7 +75,6 @@ namespace abrv_dicary
             {
                 result = false;
             }
-            dbConnection = null;
 
             return result;
         }

@@ -1,5 +1,5 @@
 ﻿
-namespace abrv_dicary
+namespace AbrvDicary
 {
     partial class Form1
     {
